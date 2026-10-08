@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seni Silat Warisan Melayu - Laporan Kehadiran & Pendaftaran</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Plus Jakarta Sans & Cinzel -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- QRCode.js Library for Pass Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- HTML5 QR Code Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: {
+                            850: '#064e3b',
+                            950: '#022c22',
+                        },
+                        amber: {
+                            450: '#f59e0b',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        royal: ['Cinzel', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at top center, #064e3b 0%, #022c22 60%, #011711 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+        }
+        .glass-panel {
+            background: rgba(6, 78, 59, 0.35);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .gold-glow {
+            box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.25);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gold-button {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #022c22;
+        }
+        .gold-button:hover {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #022c22;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d97706;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="pb-16 antialiased selection:bg-amber-500 selection:text-slate-950">
+
+    <!-- TOP BAR NAVIGATION -->
+    <header class="sticky top-0 z-40 border-b border-amber-500/20 bg-slate-950/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo & Title -->
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 p-0.5 shadow-lg flex items-center justify-center">
+                    <div id="siteLogoContainer" class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center text-amber-400 overflow-hidden relative">
+                        <i id="siteLogoIcon" class="fa-solid fa-shield-halved text-2xl"></i>
+                        <img id="siteLogoImg" src="" alt="Logo Persatuan" class="hidden w-full h-full object-cover">
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 id="siteTitleText" class="font-royal text-lg sm:text-xl font-black tracking-wide gold-gradient-text">
+                            SENI SILAT WARISAN MELAYU
+                        </h1>
+                        <button id="btnEditTitle" onclick="toggleEditTitleModal()" title="Tukar Tajuk & Logo (Khusus Admin)" class="hidden p-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 transition text-xs">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    </div>
+                    <p id="siteSubtitleText" class="text-xs text-amber-200/70 tracking-widest uppercase font-semibold">
+                        Sistem Pengurusan Kehadiran & Pendaftaran Pesilat
+                    </p>
+                </div>
+            </div>
+
+            <!-- Admin Action Button & Status Indicator -->
+            <div class="flex items-center gap-3">
+                <div id="adminBadge" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="adminStatusText">Pengunjung (Lihat Sahaja)</span>
+                </div>
+                
+                <!-- Butang Tetapan Admin (Hanya Kelihatan Selepas Log Masuk Admin) -->
+                <button id="btnAdminSettings" onclick="toggleChangePasswordModal()" class="hidden px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 hover:text-amber-200 text-xs font-bold transition flex items-center gap-2 shadow-md">
+                    <i class="fa-solid fa-gear"></i>
+                    <span class="hidden md:inline">Tetapan Admin</span>
+                </button>
+
+                <button id="btnAdminLoginToggle" onclick="handleAdminToggleClick()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-500/40 text-amber-300 hover:text-amber-200 text-xs font-bold transition flex items-center gap-2 shadow-md">
+                    <i class="fa-solid fa-user-shield text-sm"></i>
+                    <span id="btnAdminText">Log Masuk Admin</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+
+        <!-- TAB NAVIGATION BUTTONS -->
+        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-8 border-b border-slate-800 pb-4">
+            <button onclick="switchTab('kehadiran')" id="tabBtn-kehadiran" class="tab-btn px-5 py-3 rounded-xl font-bold text-sm transition flex items-center gap-2 gold-button shadow-lg">
+                <i class="fa-solid fa-clipboard-user"></i>
+                <span>Laporan Kehadiran Pesilat</span>
+            </button>
+            <button onclick="switchTab('pendaftaran')" id="tabBtn-pendaftaran" class="tab-btn px-5 py-3 rounded-xl font-bold text-sm transition flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700">
+                <i class="fa-solid fa-user-plus"></i>
+                <span>Pendaftaran Ahli Baru</span>
+            </button>
+            <button onclick="switchTab('senarai')" id="tabBtn-senarai" class="tab-btn px-5 py-3 rounded-xl font-bold text-sm transition flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700">
+                <i class="fa-solid fa-users"></i>
+                <span>Direktori Pesilat & Pass QR</span>
+            </button>
+            <!-- Muat Turun Salinan Kehadiran Harian -->
+            <button onclick="downloadDailyAttendanceReport()" class="px-4 py-3 rounded-xl font-bold text-sm transition flex items-center gap-2 bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 ml-auto shadow-md">
+                <i class="fa-solid fa-file-arrow-down"></i>
+                <span>Muat Turun Salinan Kehadiran Harian</span>
+            </button>
+        </div>
+
+        <!-- ================= TAB 1: LAPORAN KEHADIRAN PESILAT ================= -->
+        <section id="view-kehadiran" class="space-y-6">
+            
+            <!-- SECTION IMBAS QR DENGAN KAMERA BELAKANG -->
+            <div class="glass-panel p-5 rounded-2xl border-2 border-amber-500/30 gold-glow">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
+                    <div class="flex items-center gap-3 text-center sm:text-left">
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400">
+                            <i class="fa-solid fa-qrcode text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-royal text-lg font-bold text-amber-400 flex items-center gap-2 justify-center sm:justify-start">
+                                Imbas Kod QR Kehadiran (Scan 1: Bayar RM2 | Scan 2: Hutang)
+                                <span id="qrAdminOnlyBadge" class="text-[10px] font-sans px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold">Khusus Admin</span>
+                            </h2>
+                            <p class="text-xs text-slate-300">Halakan kamera ke Pass Digital. Imbasan 1x = Bayar RM 2.00, Imbasan 2x = Tukar kepada Hutang RM2.00.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button id="btnStartScanner" onclick="startQRScanner()" class="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold text-xs rounded-xl shadow-lg border border-emerald-400/40 transition flex items-center gap-2">
+                            <i class="fa-solid fa-camera"></i> Buka Kamera Belakang
+                        </button>
+                        <button id="btnStopScanner" onclick="stopQRScanner()" class="hidden px-5 py-2.5 bg-rose-600/30 hover:bg-rose-600/50 border border-rose-500/40 text-rose-300 font-bold text-xs rounded-xl transition flex items-center gap-2">
+                            <i class="fa-solid fa-circle-xmark"></i> Tutup Kamera
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Camera Viewport Container -->
+                <div id="scannerContainer" class="hidden flex-col items-center justify-center space-y-3">
+                    <div class="relative w-full max-w-md h-72 rounded-2xl overflow-hidden bg-slate-950 border-2 border-amber-500/50 shadow-2xl flex items-center justify-center">
+                        <div id="qrReader" class="w-full h-full"></div>
+                    </div>
+                    <p class="text-[11px] text-amber-400/90 font-medium flex items-center gap-1">
+                        <i class="fa-solid fa-lightbulb"></i> Sila pastikan anda telah membenarkan (*allow*) kebenaran kamera pada peranti anda.
+                    </p>
+                </div>
+
+                <!-- Live Scan Confirmation Result Banner -->
+                <div id="scanResultBanner" class="hidden mt-3 p-4 rounded-xl bg-emerald-950/80 border border-emerald-500/50 text-emerald-200 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-xl">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div>
+                            <p id="scanResultTitle" class="text-xs font-bold text-emerald-300">KEHADIRAN & BAYARAN DISAHKAN!</p>
+                            <p id="scanResultDetails" class="text-sm font-semibold text-white"></p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span id="scanResultAmount" class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-extrabold text-xs border border-amber-500/40 block mb-1">+ RM 2.00</span>
+                        <span id="scanResultTime" class="text-[10px] bg-emerald-900/60 px-2.5 py-1 rounded-md text-emerald-300 font-mono"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kehadiran Header Stats & Date Controls -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+                <!-- Date Picker Card -->
+                <div class="glass-card p-4 rounded-2xl flex flex-col justify-between">
+                    <label class="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2 block">
+                        <i class="fa-solid fa-calendar-days mr-1"></i> Tarikh Sesi Latihan
+                    </label>
+                    <input type="date" id="attendanceDate" onchange="onDateChange()" class="w-full bg-slate-950 border border-amber-500/30 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-400">
+                </div>
+
+                <!-- Total Pesilat Stat -->
+                <div class="glass-card p-4 rounded-2xl flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">Pesilat Berdaftar</p>
+                        <p id="statTotal" class="text-2xl font-extrabold text-white">0</p>
+                    </div>
+                </div>
+
+                <!-- Total Present Stat -->
+                <div class="glass-card p-4 rounded-2xl flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">Hadir (Lunas)</p>
+                        <p id="statHadir" class="text-2xl font-extrabold text-emerald-400">0</p>
+                    </div>
+                </div>
+
+                <!-- Total Present But Debt Stat -->
+                <div class="glass-card p-4 rounded-2xl flex items-center gap-4 border border-amber-500/30">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-amber-300 font-medium">Hadir (Hutang)</p>
+                        <p id="statHutang" class="text-2xl font-extrabold text-amber-400">0</p>
+                    </div>
+                </div>
+
+                <!-- Total Absent Stat -->
+                <div class="glass-card p-4 rounded-2xl flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-user-xmark"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">Tidak Hadir</p>
+                        <p id="statTidakHadir" class="text-2xl font-extrabold text-rose-400">0</p>
+                    </div>
+                </div>
+
+                <!-- Total Fee Collected Stat -->
+                <div class="glass-card p-4 rounded-2xl flex items-center justify-between border-2 border-amber-500/40">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 flex items-center justify-center text-xl font-black shadow-md">
+                            <i class="fa-solid fa-coins"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] text-amber-300 font-bold uppercase tracking-wide">Kutipan Yuran</p>
+                            <p id="statKutipan" class="text-2xl font-black gold-gradient-text">RM 0.00</p>
+                        </div>
+                    </div>
+                    <button onclick="toggleDuitNowModal()" title="Papar QR DuitNow RM2.00" class="p-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 transition text-xs">
+                        <i class="fa-solid fa-qrcode text-base"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Attendance Control Bar (Quick Actions for Admin) -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/90 p-4 rounded-2xl border border-slate-800">
+                <div class="flex items-center gap-2">
+                    <div id="readOnlyNotice" class="text-xs text-amber-300/80 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                        <i class="fa-solid fa-lock text-amber-400"></i>
+                        <span>Mod Awam (Lihat Sahaja). Log masuk Admin untuk menukar kehadiran & status bayaran.</span>
+                    </div>
+                    <div id="adminNotice" class="hidden text-xs text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                        <i class="fa-solid fa-user-check text-emerald-400"></i>
+                        <span>Mod Admin Aktif: Tekan status untuk menukar kehadiran, lunas bayaran atau tanda hutang.</span>
+                    </div>
+                </div>
+
+                <!-- Admin Quick Actions -->
+                <div id="adminActionButtons" class="hidden flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                    <button onclick="setAllAttendance('hadir')" class="flex-1 sm:flex-none px-3 py-2 bg-emerald-600/30 hover:bg-emerald-600/50 border border-emerald-500/40 text-emerald-300 text-xs font-bold rounded-xl transition">
+                        <i class="fa-solid fa-check-double mr-1"></i> Semua Hadir (+RM2)
+                    </button>
+                    <button onclick="setAllAttendance('hadir_hutang')" class="flex-1 sm:flex-none px-3 py-2 bg-amber-600/30 hover:bg-amber-600/50 border border-amber-500/40 text-amber-300 text-xs font-bold rounded-xl transition">
+                        <i class="fa-solid fa-hand-holding-dollar mr-1"></i> Semua Hadir (Hutang)
+                    </button>
+                    <button onclick="setAllAttendance('tidak_hadir')" class="flex-1 sm:flex-none px-3 py-2 bg-rose-600/30 hover:bg-rose-600/50 border border-rose-500/40 text-rose-300 text-xs font-bold rounded-xl transition">
+                        <i class="fa-solid fa-xmark mr-1"></i> Semua Tidak Hadir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table of Attendance Records -->
+            <div class="glass-panel rounded-2xl overflow-hidden border border-amber-500/20">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-950/90 text-amber-400 font-royal uppercase text-xs border-b border-amber-500/20">
+                            <tr>
+                                <th class="py-4 px-4 text-center">Bil</th>
+                                <th class="py-4 px-4">Nama Penuh Pesilat</th>
+                                <th class="py-4 px-4">No. MyKad / Pengenalan</th>
+                                <th class="py-4 px-4">Jantina</th>
+                                <th class="py-4 px-4 text-center">Status Kehadiran</th>
+                                <th class="py-4 px-4 text-center">Yuran Sesi (RM 2.00)</th>
+                                <th id="thAdminAction" class="hidden py-4 px-4 text-center">Tindakan Admin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTableBody" class="divide-y divide-slate-800 text-slate-200">
+                            <!-- Dynamic Content Rendered Here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 2: PENDAFTARAN AHLI BARU ================= -->
+        <section id="view-pendaftaran" class="hidden max-w-3xl mx-auto">
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl border-2 border-amber-500/30 gold-glow">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-800">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xl">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-royal text-xl font-bold gold-gradient-text">Borang Pendaftaran Pesilat Baru</h2>
+                        <p class="text-xs text-slate-300">Daftar maklumat pesilat untuk menjana ID & Pass QR Kehadiran.</p>
+                    </div>
+                </div>
+
+                <form id="formPendaftaran" onsubmit="handleRegistration(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Nama Penuh Pesilat <span class="text-rose-400">*</span></label>
+                            <input type="text" id="regNama" required placeholder="Contoh: Muhammad Amirul bin Rosli" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">No. MyKad / Sijil Lahir <span class="text-rose-400">*</span></label>
+                            <input type="text" id="regDokumen" required placeholder="Contoh: 081215085543" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Tarikh Lahir</label>
+                            <input type="date" id="regTarikhLahir" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Jantina</label>
+                            <select id="regJantina" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+                                <option value="Lelaki">Lelaki</option>
+                                <option value="Perempuan">Perempuan</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">No. Telefon Pesilat</label>
+                            <input type="tel" id="regPhone" placeholder="Contoh: 0112345678" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-bold text-amber-300 uppercase mb-1">No. Telefon Waris / Kecemasan <span class="text-rose-400">*</span></label>
+                            <input type="tel" id="regWarisPhone" required placeholder="Contoh: 0198765432" class="w-full bg-slate-950 border border-amber-500/40 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Alamat Kediaman</label>
+                            <textarea id="regAlamat" rows="2" placeholder="Alamat lengkap pesilat..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="w-full gold-button py-3.5 rounded-xl font-bold text-sm shadow-xl transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-address-card"></i> Daftar Pesilat & Jana Pass Digital QR
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- ================= TAB 3: DIREKTORI PESILAT & KAD PASS QR ================= -->
+        <section id="view-senarai" class="hidden space-y-6">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/80 p-4 rounded-2xl border border-slate-800">
+                <div class="relative w-full sm:w-80">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="searchPesilatInput" onkeyup="filterPesilatDirectory()" placeholder="Cari nama atau No IC..." class="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-amber-400">
+                </div>
+                <div class="text-xs text-slate-400">
+                    Klik butang di kad pesilat untuk memuat turun Kad Pass Digital.
+                </div>
+            </div>
+
+            <div id="pesilatCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Dynamic Pesilat Cards Rendered Here -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL: LOG MASUK ADMIN -->
+    <div id="modalAdminLogin" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel border-2 border-amber-500/40 w-full max-w-md p-6 rounded-2xl gold-glow relative">
+            <button onclick="toggleAdminModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 bg-amber-500/10 border border-amber-500/30 rounded-2xl mx-auto flex items-center justify-center text-amber-400 text-2xl mb-3">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="font-royal text-xl font-bold text-amber-400">Log Masuk Admin</h3>
+                <p class="text-xs text-slate-300 mt-1">Masukkan kata laluan untuk pengurusan sistem.</p>
+            </div>
+
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Kata Laluan Admin</label>
+                    <input type="password" id="adminPasswordInput" required placeholder="Sila masukkan kata laluan" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400">
+                    <p class="text-[10px] text-amber-300/80 mt-1">Kata laluan lalai (*default*): <code class="bg-slate-900 px-1 py-0.5 rounded border border-amber-500/30 font-mono">silat123</code></p>
+                </div>
+
+                <button type="submit" class="w-full gold-button py-3 rounded-xl font-bold text-sm shadow-lg transition">
+                    Log Masuk Mod Admin
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: TETAPAN ADMIN & NO WHATSAPP (Hanya Boleh Diakses Selepas Log Masuk) -->
+    <div id="modalChangePassword" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel border-2 border-amber-500/40 w-full max-w-md p-6 rounded-2xl gold-glow relative">
+            <button onclick="toggleChangePasswordModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 bg-amber-500/10 border border-amber-500/30 rounded-2xl mx-auto flex items-center justify-center text-amber-400 text-2xl mb-3">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <h3 class="font-royal text-xl font-bold text-amber-400">Tetapan Admin & WhatsApp</h3>
+                <p class="text-xs text-slate-300 mt-1">Kemaskini kata laluan dan nombor WhatsApp Admin.</p>
+            </div>
+
+            <form onsubmit="handleChangePassword(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-amber-300 uppercase mb-1">
+                        <i class="fa-brands fa-whatsapp text-emerald-400 mr-1"></i> Nombor WhatsApp Admin <span class="text-rose-400">*</span>
+                    </label>
+                    <input type="tel" id="adminPhoneInput" required placeholder="Contoh: 60123456789" class="w-full bg-slate-950 border border-amber-500/40 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400">
+                    <p class="text-[10px] text-slate-400 mt-1">Format lengkap termasuk kod negara (Contoh: 60123456789 atau 0123456789).</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Kata Laluan Semasa</label>
+                    <input type="password" id="currentPassInput" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Kata Laluan Baharu</label>
+                    <input type="password" id="newPassInput" required minlength="4" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400">
+                </div>
+
+                <button type="submit" class="w-full gold-button py-3 rounded-xl font-bold text-sm shadow-lg transition">
+                    Simpan Tetapan Admin
+                </button>
+            </form>
+
+            <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs">
+                <span class="text-slate-400">Bantuan sistem?</span>
+                <button onclick="contactAdminWhatsApp()" class="text-emerald-400 hover:underline font-bold flex items-center gap-1">
+                    <i class="fa-brands fa-whatsapp"></i> Hantar Maklumat Ke WhatsApp Admin
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TUKAR TAJUK & LOGO PAGE (ADMIN SAHAJA) -->
+    <div id="modalEditTitle" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel border-2 border-amber-500/40 w-full max-w-md p-6 rounded-2xl gold-glow relative">
+            <button onclick="toggleEditTitleModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="text-center mb-6">
+                <div class="w-14 h-14 bg-amber-500/10 border border-amber-500/30 rounded-2xl mx-auto flex items-center justify-center text-amber-400 text-2xl mb-3">
+                    <i class="fa-solid fa-pen-nib"></i>
+                </div>
+                <h3 class="font-royal text-xl font-bold text-amber-400">Kemaskini Tajuk & Logo Halaman</h3>
+                <p class="text-xs text-slate-300 mt-1">Suaikan nama pergerakan dan muat naik logo persatuan anda.</p>
+            </div>
+
+            <form onsubmit="handleSaveTitle(event)" class="space-y-4">
+                <!-- PETAK KOSONG UNTUK MUAT NAIK LOGO DARI GALERI TELEFON -->
+                <div>
+                    <label class="block text-xs font-bold text-amber-300 uppercase mb-1">
+                        <i class="fa-solid fa-image mr-1"></i> Logo Persatuan (Pilih Dari Galeri Telefon)
+                    </label>
+                    <div class="relative border-2 border-dashed border-amber-500/40 hover:border-amber-400 rounded-2xl p-4 text-center bg-slate-950/90 hover:bg-slate-900 transition cursor-pointer">
+                        <input type="file" id="editSiteLogoInput" accept="image/*" onchange="handleLogoSelect(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                        <div id="logoPreviewContainer" class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                            <div id="logoPreviewBox" class="w-16 h-16 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 overflow-hidden shrink-0">
+                                <i id="logoPreviewPlaceholder" class="fa-solid fa-cloud-arrow-up text-2xl"></i>
+                                <img id="logoPreviewImg" src="" class="hidden w-full h-full object-cover rounded-xl" alt="Preview Logo">
+                            </div>
+                            <div class="text-center sm:text-left">
+                                <p id="logoPreviewText" class="text-xs font-bold text-amber-300">Klik di sini untuk pilih logo dari Galeri</p>
+                                <p class="text-[10px] text-slate-400 mt-0.5">Format disokong: PNG, JPG, JPEG atau WEBP</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Tajuk Utama</label>
+                    <input type="text" id="editSiteTitleInput" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Sub-Tajuk</label>
+                    <input type="text" id="editSiteSubtitleInput" required class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-400">
+                </div>
+
+                <button type="submit" class="w-full gold-button py-3 rounded-xl font-bold text-sm shadow-lg transition">
+                    Simpan Perubahan
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: DUITNOW QR CODE PAYMENT (RM 2.00) -->
+    <div id="modalDuitNowQR" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel border-2 border-amber-500/40 w-full max-w-sm p-6 rounded-2xl gold-glow text-center relative">
+            <button onclick="toggleDuitNowModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="w-12 h-12 bg-amber-500/10 border border-amber-500/30 rounded-2xl mx-auto flex items-center justify-center text-amber-400 text-2xl mb-3">
+                <i class="fa-solid fa-money-bill-wave"></i>
+            </div>
+            <h3 class="font-royal text-lg font-bold text-amber-400">Bayaran Yuran Latihan RM 2.00</h3>
+            <p class="text-xs text-slate-300 mt-1 mb-4">Imbas Kod QR DuitNow di bawah untuk membuat bayaran yuran latihan sebanyak RM 2.00.</p>
+
+            <div class="bg-white p-4 rounded-2xl border-4 border-amber-500 inline-block my-2 shadow-2xl relative">
+                <img src="https://placehold.co/220x220/022c22/f59e0b?text=DuitNow+QR%0ARM+2.00" alt="DuitNow QR RM2.00" class="w-48 h-48 rounded-lg object-cover mx-auto">
+                <span class="absolute bottom-2 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider">RM 2.00 Sahaja</span>
+            </div>
+
+            <p class="text-[11px] text-amber-300 font-semibold mt-3">Sistem akan merekodkan bayaran RM 2.00 secara automatik pada imbasan pertama QR.</p>
+        </div>
+    </div>
+
+    <!-- MODAL: PAPAR KOD QR PASS DIGITAL -->
+    <div id="modalQRPass" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel border-2 border-amber-500/40 w-full max-w-sm p-6 rounded-2xl gold-glow text-center relative">
+            <button onclick="closeQRModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <h3 class="font-royal text-lg font-bold text-amber-400 mb-1">Pass Digital Pesilat</h3>
+            <p id="qrModalNama" class="text-sm font-bold text-white"></p>
+            <p id="qrModalID" class="text-xs text-amber-300/80 font-mono mb-4"></p>
+
+            <div class="bg-white p-4 rounded-2xl border-4 border-amber-500 inline-block my-2 shadow-2xl">
+                <div id="qrcodeDisplay" class="flex justify-center"></div>
+            </div>
+
+            <p class="text-[11px] text-slate-300 mt-2 mb-4">Gunakan Kod QR ini untuk diimbas semasa kehadiran sesi latihan.</p>
+
+            <!-- Butang Muat Turun Kad Pass QR ke Galeri Telefon -->
+            <button onclick="downloadQRPassImage()" class="w-full gold-button py-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-lg hover:scale-105 transform duration-200">
+                <i class="fa-solid fa-download text-sm"></i> Simpan / Muat Turun ke Galeri
+            </button>
+        </div>
+    </div>
+
+    <!-- CUSTOM CONFIRMATION MODAL (Replaces window.confirm) -->
+    <div id="modalConfirmDialog" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel border-2 border-amber-500/40 w-full max-w-sm p-6 rounded-2xl gold-glow text-center relative">
+            <div class="w-12 h-12 bg-amber-500/20 border border-amber-500/40 rounded-full flex items-center justify-center text-amber-400 text-xl mx-auto mb-3">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 id="confirmModalTitle" class="font-royal text-lg font-bold text-amber-400 mb-2">Pengesahan Action</h3>
+            <p id="confirmModalMessage" class="text-xs text-slate-200 mb-6 leading-relaxed"></p>
+            
+            <div class="flex items-center gap-3">
+                <button id="btnConfirmCancel" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition border border-slate-700">
+                    Batal
+                </button>
+                <button id="btnConfirmOk" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 text-white font-bold text-xs shadow-lg transition border border-rose-400/40">
+                    Sahkan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APPLICATION JAVASCRIPT LOGIC -->
+    <script>
+        let html5QrScannerInstance = null;
+        let lastScannedText = "";
+        let lastScanTimestamp = 0;
+        let currentQRModalPesilatId = null;
+        let confirmActionCallback = null;
+        let tempSelectedLogo = null;
+        
+        let appState = {
+            isAdminLoggedIn: false,
+            adminPassword: "silat123",
+            adminPhone: "60123456789", // Nombor WhatsApp Admin
+            siteTitle: "SENI SILAT WARISAN MELAYU",
+            siteSubtitle: "Sistem Pengurusan Kehadiran & Pendaftaran Pesilat",
+            siteLogo: null, // Holds Data URL image for logo
+            selectedDate: new Date().toISOString().split('T')[0],
+            pesilatList: [
+                {
+                    id: "PSL-001",
+                    nama: "Muhammad Amirul bin Rosli",
+                    noDokumen: "081215085543",
+                    tarikhLahir: "2008-12-15",
+                    jantina: "Lelaki",
+                    phone: "0112345678",
+                    warisPhone: "0198765432",
+                    alamat: "No 12, Jalan Warisan 3, Taman Silat, Perak"
+                },
+                {
+                    id: "PSL-002",
+                    nama: "Nur Aisyah binti Ahmad",
+                    noDokumen: "100420086612",
+                    tarikhLahir: "2010-04-20",
+                    jantina: "Perempuan",
+                    phone: "0134567890",
+                    warisPhone: "0129988776",
+                    alamat: "Lot 45, Kampung Pahang, Perak"
+                }
+            ],
+            attendanceRecords: {}
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Set initial date picker value
+            document.getElementById('attendanceDate').value = appState.selectedDate;
+            
+            // Setup confirmation modal event handlers
+            document.getElementById('btnConfirmCancel').onclick = closeConfirmModal;
+
+            // Render Initial Views & Titles
+            renderSiteTitles();
+            renderAttendanceTable();
+            renderSenaraiPesilat();
+            updateAdminUI();
+        });
+
+        // Play synth beep sound on QR scan success (2-Second Tone)
+        function playBeepSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(660, audioCtx.currentTime); // E5
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.5); // Warm transition to A5
+
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 2.0); // Sustains for 2 full seconds
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 2.0); // 2 Seconds Duration
+            } catch(e) {
+                console.log("Audio feedback skipped or blocked by browser policy.", e);
+            }
+        }
+
+        function showConfirmModal(title, message, onConfirm) {
+            document.getElementById('confirmModalTitle').innerText = title;
+            document.getElementById('confirmModalMessage').innerText = message;
+            confirmActionCallback = onConfirm;
+
+            const okBtn = document.getElementById('btnConfirmOk');
+            okBtn.onclick = () => {
+                closeConfirmModal();
+                if (typeof confirmActionCallback === 'function') {
+                    confirmActionCallback();
+                }
+            };
+
+            document.getElementById('modalConfirmDialog').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('modalConfirmDialog').classList.add('hidden');
+            confirmActionCallback = null;
+        }
+
+        function renderSiteTitles() {
+            const titleEl = document.getElementById('siteTitleText');
+            const subtitleEl = document.getElementById('siteSubtitleText');
+            const logoIcon = document.getElementById('siteLogoIcon');
+            const logoImg = document.getElementById('siteLogoImg');
+
+            if (titleEl) titleEl.innerText = appState.siteTitle;
+            if (subtitleEl) subtitleEl.innerText = appState.siteSubtitle;
+
+            if (appState.siteLogo) {
+                if (logoImg) {
+                    logoImg.src = appState.siteLogo;
+                    logoImg.classList.remove('hidden');
+                }
+                if (logoIcon) logoIcon.classList.add('hidden');
+            } else {
+                if (logoImg) logoImg.classList.add('hidden');
+                if (logoIcon) logoIcon.classList.remove('hidden');
+            }
+        }
+
+        function handleLogoSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                showToast("Sila pilih fail imej dari galeri anda.", "error");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                tempSelectedLogo = evt.target.result;
+                const previewImg = document.getElementById('logoPreviewImg');
+                const placeholder = document.getElementById('logoPreviewPlaceholder');
+                const previewText = document.getElementById('logoPreviewText');
+
+                if (previewImg) {
+                    previewImg.src = tempSelectedLogo;
+                    previewImg.classList.remove('hidden');
+                }
+                if (placeholder) placeholder.classList.add('hidden');
+                if (previewText) previewText.innerText = "Imej dipilih! Tekan Simpan Perubahan.";
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function toggleEditTitleModal() {
+            if (!appState.isAdminLoggedIn) {
+                showToast("Akses Terhad: Hanya Admin sahaja dibenarkan menukar tajuk & logo.", "warning");
+                toggleAdminModal();
+                return;
+            }
+
+            const modal = document.getElementById('modalEditTitle');
+            if (modal.classList.contains('hidden')) {
+                document.getElementById('editSiteTitleInput').value = appState.siteTitle;
+                document.getElementById('editSiteSubtitleInput').value = appState.siteSubtitle;
+                
+                tempSelectedLogo = appState.siteLogo;
+                const previewImg = document.getElementById('logoPreviewImg');
+                const placeholder = document.getElementById('logoPreviewPlaceholder');
+                const previewText = document.getElementById('logoPreviewText');
+
+                if (appState.siteLogo) {
+                    if (previewImg) {
+                        previewImg.src = appState.siteLogo;
+                        previewImg.classList.remove('hidden');
+                    }
+                    if (placeholder) placeholder.classList.add('hidden');
+                    if (previewText) previewText.innerText = "Logo sedia ada digunakan.";
+                } else {
+                    if (previewImg) previewImg.classList.add('hidden');
+                    if (placeholder) placeholder.classList.remove('hidden');
+                    if (previewText) previewText.innerText = "Klik di sini untuk pilih logo dari Galeri";
+                }
+
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function handleSaveTitle(e) {
+            e.preventDefault();
+            if (!appState.isAdminLoggedIn) {
+                showToast("Sila Log Masuk Admin terlebih dahulu.", "error");
+                return;
+            }
+
+            const newTitle = document.getElementById('editSiteTitleInput').value.trim();
+            const newSubtitle = document.getElementById('editSiteSubtitleInput').value.trim();
+
+            if (newTitle && newSubtitle) {
+                appState.siteTitle = newTitle;
+                appState.siteSubtitle = newSubtitle;
+                if (tempSelectedLogo) {
+                    appState.siteLogo = tempSelectedLogo;
+                }
+                renderSiteTitles();
+                toggleEditTitleModal();
+                showToast("Tajuk & Logo halaman berjaya dikemaskini!", "success");
+            }
+        }
+
+        function switchTab(tabName) {
+            stopQRScanner();
+
+            document.getElementById('view-kehadiran').classList.add('hidden');
+            document.getElementById('view-pendaftaran').classList.add('hidden');
+            document.getElementById('view-senarai').classList.add('hidden');
+
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
+
+            const tabs = ['kehadiran', 'pendaftaran', 'senarai'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tabBtn-${t}`);
+                if (btn) {
+                    btn.className = "tab-btn px-5 py-3 rounded-xl font-bold text-sm transition flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700";
+                }
+            });
+
+            const activeBtn = document.getElementById(`tabBtn-${tabName}`);
+            if (activeBtn) {
+                activeBtn.className = "tab-btn px-5 py-3 rounded-xl font-bold text-sm transition flex items-center gap-2 gold-button shadow-lg";
+            }
+        }
+
+        function onDateChange() {
+            const dateInput = document.getElementById('attendanceDate').value;
+            if (dateInput) {
+                appState.selectedDate = dateInput;
+                renderAttendanceTable();
+            }
+        }
+
+        function renderAttendanceTable() {
+            const tbody = document.getElementById('attendanceTableBody');
+            const dateVal = appState.selectedDate;
+
+            if (!appState.attendanceRecords[dateVal]) {
+                appState.attendanceRecords[dateVal] = {};
+            }
+
+            const currentRecords = appState.attendanceRecords[dateVal];
+
+            let hadirLunasCount = 0;
+            let hadirHutangCount = 0;
+            let tidakHadirCount = 0;
+            let totalKutipan = 0;
+            let totalHutang = 0;
+            let html = '';
+
+            if (appState.pesilatList.length === 0) {
+                html = `<tr><td colspan="7" class="py-8 text-center text-slate-400">Tiada pesilat berdaftar lagi. Sila daftar ahli baru.</td></tr>`;
+            } else {
+                appState.pesilatList.forEach((pesilat, idx) => {
+                    const record = currentRecords[pesilat.id] || { status: 'tidak_hadir', paymentStatus: 'belum_bayar', paid: false, isHutang: false, amount: 0 };
+                    
+                    let pStatus = record.paymentStatus;
+                    if (!pStatus) {
+                        if (record.paid) pStatus = 'lunas';
+                        else if (record.isHutang) pStatus = 'hutang';
+                        else pStatus = 'belum_bayar';
+                    }
+
+                    const isHadir = record.status === 'hadir';
+
+                    if (isHadir) {
+                        if (pStatus === 'lunas') {
+                            hadirLunasCount++;
+                            totalKutipan += (record.amount || 2.00);
+                        } else {
+                            hadirHutangCount++;
+                            totalHutang += 2.00;
+                        }
+                    } else {
+                        tidakHadirCount++;
+                    }
+
+                    let payBadgeClass = '';
+                    let payBadgeIcon = '';
+                    let payBadgeText = '';
+
+                    if (pStatus === 'lunas') {
+                        payBadgeClass = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30';
+                        payBadgeIcon = 'fa-coins text-amber-400';
+                        payBadgeText = 'RM 2.00 (LUNAS)';
+                    } else if (pStatus === 'hutang') {
+                        payBadgeClass = 'bg-amber-500/25 text-amber-300 border-amber-500/50 hover:bg-amber-500/35 ring-1 ring-amber-500/30';
+                        payBadgeIcon = 'fa-triangle-exclamation text-amber-400 animate-pulse';
+                        payBadgeText = 'HADIR (HUTANG RM2)';
+                    } else {
+                        payBadgeClass = 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700';
+                        payBadgeIcon = 'fa-circle-minus';
+                        payBadgeText = 'BELUM BAYAR';
+                    }
+
+                    html += `
+                        <tr class="hover:bg-slate-900/50 transition">
+                            <td class="py-3 px-4 text-center font-bold text-slate-400">${idx + 1}</td>
+                            <td class="py-3 px-4 font-semibold text-white">${pesilat.nama}</td>
+                            <td class="py-3 px-4 font-mono text-xs text-amber-300">${pesilat.noDokumen}</td>
+                            <td class="py-3 px-4 text-xs">${pesilat.jantina}</td>
+                            <td class="py-3 px-4 text-center">
+                                <button onclick="toggleAttendanceStatus('${pesilat.id}')" 
+                                    class="px-3 py-1.5 rounded-xl font-bold text-xs border transition flex items-center justify-center gap-1.5 mx-auto ${
+                                        isHadir 
+                                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30' 
+                                        : 'bg-rose-500/20 text-rose-300 border-rose-500/40 hover:bg-rose-500/30'
+                                    }">
+                                    <i class="fa-solid ${isHadir ? 'fa-circle-check text-emerald-400' : 'fa-circle-xmark text-rose-400'}"></i>
+                                    <span>${isHadir ? 'HADIR' : 'TIDAK HADIR'}</span>
+                                </button>
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                <div class="flex items-center justify-center gap-1.5">
+                                    <button onclick="cyclePaymentStatus('${pesilat.id}')"
+                                        title="Klik untuk tukar: LUNAS -> HUTANG -> BELUM BAYAR"
+                                        class="px-3 py-1.5 rounded-xl font-extrabold text-xs border transition flex items-center justify-center gap-1.5 ${payBadgeClass}">
+                                        <i class="fa-solid ${payBadgeIcon}"></i>
+                                        <span>${payBadgeText}</span>
+                                    </button>
+                                    ${appState.isAdminLoggedIn ? `
+                                        <button onclick="setPaymentStatus('${pesilat.id}', 'hutang')"
+                                            title="Tanda Hadir Tapi Hutang RM2.00"
+                                            class="px-2 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/30 text-[11px] font-bold transition flex items-center gap-1">
+                                            <i class="fa-solid fa-hand-holding-dollar"></i> Hutang
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </td>
+                            ${appState.isAdminLoggedIn ? `
+                                <td class="py-3 px-4 text-center">
+                                    <button onclick="deletePesilat('${pesilat.id}')" class="px-2.5 py-1 bg-rose-950 hover:bg-rose-900 border border-rose-500/40 text-rose-300 rounded-lg text-xs font-semibold transition">
+                                        <i class="fa-solid fa-trash mr-1"></i> Padam
+                                    </button>
+                                </td>
+                            ` : ''}
+                        </tr>
+                    `;
+                });
+            }
+
+            tbody.innerHTML = html;
+
+            document.getElementById('statTotal').innerText = appState.pesilatList.length;
+            document.getElementById('statHadir').innerText = hadirLunasCount;
+            const statHutangEl = document.getElementById('statHutang');
+            if (statHutangEl) statHutangEl.innerText = `${hadirHutangCount} (${totalHutang > 0 ? 'RM' + totalHutang : 'RM0'})`;
+            document.getElementById('statTidakHadir').innerText = tidakHadirCount;
+            document.getElementById('statKutipan').innerText = `RM ${totalKutipan.toFixed(2)}`;
+        }
+
+        function toggleAttendanceStatus(pesilatId) {
+            if (!appState.isAdminLoggedIn) {
+                showToast("Akses Terhad: Sila Log Masuk Admin untuk menukar status kehadiran.", "warning");
+                toggleAdminModal();
+                return;
+            }
+
+            const dateVal = appState.selectedDate;
+            if (!appState.attendanceRecords[dateVal]) {
+                appState.attendanceRecords[dateVal] = {};
+            }
+
+            const record = appState.attendanceRecords[dateVal][pesilatId] || { status: 'tidak_hadir', paymentStatus: 'belum_bayar', paid: false, amount: 0 };
+            
+            if (record.status === 'hadir') {
+                appState.attendanceRecords[dateVal][pesilatId] = { status: 'tidak_hadir', paymentStatus: 'belum_bayar', paid: false, isHutang: false, amount: 0 };
+            } else {
+                appState.attendanceRecords[dateVal][pesilatId] = { status: 'hadir', paymentStatus: 'lunas', paid: true, isHutang: false, amount: 2.00 };
+            }
+            
+            renderAttendanceTable();
+        }
+
+        function cyclePaymentStatus(pesilatId) {
+            if (!appState.isAdminLoggedIn) {
+                showToast("Sila Log Masuk Admin untuk mengemaskini status bayaran.", "warning");
+                toggleAdminModal();
+                return;
+            }
+
+            const dateVal = appState.selectedDate;
+            if (!appState.attendanceRecords[dateVal]) {
+                appState.attendanceRecords[dateVal] = {};
+            }
+
+            const record = appState.attendanceRecords[dateVal][pesilatId] || { status: 'hadir', paymentStatus: 'belum_bayar', paid: false, amount: 0 };
+            
+            let currentStatus = record.paymentStatus;
+            if (!currentStatus) {
+                currentStatus = record.paid ? 'lunas' : (record.isHutang ? 'hutang' : 'belum_bayar');
+            }
+
+            if (currentStatus === 'lunas') {
+                record.paymentStatus = 'hutang';
+                record.paid = false;
+                record.isHutang = true;
+                record.amount = 0;
+                record.status = 'hadir';
+                showToast("Status ditukar: HADIR (HUTANG RM 2.00).", "warning");
+            } else if (currentStatus === 'hutang') {
+                record.paymentStatus = 'belum_bayar';
+                record.paid = false;
+                record.isHutang = false;
+                record.amount = 0;
+                showToast("Status bayaran ditukar: BELUM BAYAR.", "info");
+            } else {
+                record.paymentStatus = 'lunas';
+                record.paid = true;
+                record.isHutang = false;
+                record.amount = 2.00;
+                record.status = 'hadir';
+                showToast("Status bayaran ditukar: LUNAS (RM 2.00).", "success");
+            }
+
+            appState.attendanceRecords[dateVal][pesilatId] = record;
+            renderAttendanceTable();
+        }
+
+        function setPaymentStatus(pesilatId, targetStatus) {
+            if (!appState.isAdminLoggedIn) {
+                showToast("Akses Terhad: Sila Log Masuk Admin.", "warning");
+                toggleAdminModal();
+                return;
+            }
+
+            const dateVal = appState.selectedDate;
+            if (!appState.attendanceRecords[dateVal]) {
+                appState.attendanceRecords[dateVal] = {};
+            }
+
+            const record = appState.attendanceRecords[dateVal][pesilatId] || { status: 'hadir', paymentStatus: 'belum_bayar', paid: false, amount: 0 };
+
+            if (targetStatus === 'hutang') {
+                record.status = 'hadir';
+                record.paymentStatus = 'hutang';
+                record.paid = false;
+                record.isHutang = true;
+                record.amount = 0;
+                showToast("Pesilat ditanda secara manual: HADIR TAPI HUTANG YURAN RM 2.00.", "warning");
+            } else if (targetStatus === 'lunas') {
+                record.status = 'hadir';
+                record.paymentStatus = 'lunas';
+                record.paid = true;
+                record.isHutang = false;
+                record.amount = 2.00;
+                showToast("Pesilat ditanda: HADIR & Yuran RM 2.00 LUNAS.", "success");
+            } else {
+                record.paymentStatus = 'belum_bayar';
+                record.paid = false;
+                record.isHutang = false;
+                record.amount = 0;
+                showToast("Status bayaran ditukar kepada BELUM BAYAR.", "info");
+            }
+
+            appState.attendanceRecords[dateVal][pesilatId] = record;
+            renderAttendanceTable();
+        }
+
+        function setAllAttendance(targetStatus) {
+            if (!appState.isAdminLoggedIn) {
+                showToast("Sila Log Masuk Admin terlebih dahulu.", "warning");
+                toggleAdminModal();
+                return;
+            }
+
+            const dateVal = appState.selectedDate;
+            if (!appState.attendanceRecords[dateVal]) {
+                appState.attendanceRecords[dateVal] = {};
+            }
+
+            appState.pesilatList.forEach(p => {
+                if (targetStatus === 'hadir') {
+                    appState.attendanceRecords[dateVal][p.id] = { status: 'hadir', paymentStatus: 'lunas', paid: true, isHutang: false, amount: 2.00 };
+                } else if (targetStatus === 'hadir_hutang') {
+                    appState.attendanceRecords[dateVal][p.id] = { status: 'hadir', paymentStatus: 'hutang', paid: false, isHutang: true, amount: 0 };
+                } else {
+                    appState.attendanceRecords[dateVal][p.id] = { status: 'tidak_hadir', paymentStatus: 'belum_bayar', paid: false, isHutang: false, amount: 0 };
+                }
+            });
+
+            renderAttendanceTable();
+            let msg = 'Semua pesilat ditanda sebagai ';
+            if (targetStatus === 'hadir') msg += 'HADIR & Yuran RM 2.00 Dimasukkan';
+            else if (targetStatus === 'hadir_hutang') msg += 'HADIR (HUTANG YURAN RM 2.00)';
+            else msg += 'TIDAK HADIR';
+
+            showToast(msg, "success");
+        }
+
+        function startQRScanner() {
+            if (!appState.isAdminLoggedIn) {
+                showToast("Akses Terhad: Hanya Admin sahaja yang dibenarkan mengimbas Kod QR Kehadiran.", "warning");
+                toggleAdminModal();
+                return;
+            }
+
+            const container = document.getElementById('scannerContainer');
+            const btnStart = document.getElementById('btnStartScanner');
+            const btnStop = document.getElementById('btnStopScanner');
+
+            container.classList.remove('hidden');
+            btnStart.classList.add('hidden');
+            btnStop.classList.remove('hidden');
+
+            if (!html5QrScannerInstance) {
+                html5QrScannerInstance = new Html5Qrcode("qrReader");
+            }
+
+            const config = { fps: 10, qrbox: { width: 200, height: 200 } };
+
+            html5QrScannerInstance.start(
+                { facingMode: "environment" },
+                config,
+                onScanSuccess,
+                onScanFailure
+            ).catch(err => {
+                console.warn("Attempting camera fallback to user camera", err);
+                html5QrScannerInstance.start(
+                    { facingMode: "user" },
+                    config,
+                    onScanSuccess,
+                    onScanFailure
+                ).catch(err2 => {
+                    showToast("Gagal membuka kamera. Pastikan kebenaran kamera telah diberikan.", "error");
+                    stopQRScanner();
+                });
+            });
+        }
+
+        function stopQRScanner() {
+            if (html5QrScannerInstance) {
+                try {
+                    html5QrScannerInstance.stop().then(() => {
+                        html5QrScannerInstance.clear();
+                    }).catch(e => console.log(e));
+                } catch(e) {}
+            }
+
+            document.getElementById('scannerContainer').classList.add('hidden');
+            document.getElementById('btnStartScanner').classList.remove('hidden');
+            document.getElementById('btnStopScanner').classList.add('hidden');
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            const now = Date.now();
+            if (decodedText === lastScannedText && (now - lastScanTimestamp < 2000)) {
+                return;
+            }
+
+            lastScannedText = decodedText;
+            lastScanTimestamp = now;
+
+            let targetId = decodedText;
+            try {
+                const parsed = JSON.parse(decodedText);
+                if (parsed.id) targetId = parsed.id;
+            } catch(e) {}
+
+            const pesilat = appState.pesilatList.find(p => 
+                p.id.toLowerCase() === targetId.toLowerCase() || 
+                p.noDokumen === targetId
+            );
+
+            if (!pesilat) {
+                showToast(`Kod QR tidak dikenali atau tiada dalam rekod pesilat (${targetId})`, "error");
+                return;
+            }
+
+            playBeepSound();
+
+            const dateVal = appState.selectedDate;
+            if (!appState.attendanceRecords[dateVal]) {
+                appState.attendanceRecords[dateVal] = {};
+            }
+
+            const currentRecord = appState.attendanceRecords[dateVal][pesilat.id];
+
+            const banner = document.getElementById('scanResultBanner');
+            const details = document.getElementById('scanResultDetails');
+            const timeSpan = document.getElementById('scanResultTime');
+            const scanResultTitle = document.getElementById('scanResultTitle');
+            const scanResultAmount = document.getElementById('scanResultAmount');
+
+            if (!currentRecord || currentRecord.status !== 'hadir' || currentRecord.paymentStatus !== 'lunas') {
+                appState.attendanceRecords[dateVal][pesilat.id] = {
+                    status: 'hadir',
+                    paymentStatus: 'lunas',
+                    paid: true,
+                    isHutang: false,
+                    amount: 2.00
+                };
+
+                renderAttendanceTable();
+
+                if (scanResultTitle) scanResultTitle.innerText = "KEHADIRAN & BAYARAN DISAHKAN!";
+                if (scanResultAmount) {
+                    scanResultAmount.innerText = "+ RM 2.00";
+                    scanResultAmount.className = "px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-extrabold text-xs border border-amber-500/40 block mb-1";
+                }
+
+                details.innerText = `${pesilat.nama} (${pesilat.id}) - KEHADIRAN & BAYARAN LUNAS (RM2.00)`;
+                timeSpan.innerText = new Date().toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+                banner.classList.remove('hidden');
+
+                showToast(`Imbasan Pertama: ${pesilat.nama} HADIR & Bayaran RM2.00 LUNAS.`, "success");
+            } else {
+                appState.attendanceRecords[dateVal][pesilat.id] = {
+                    status: 'hadir',
+                    paymentStatus: 'hutang',
+                    paid: false,
+                    isHutang: true,
+                    amount: 0
+                };
+
+                renderAttendanceTable();
+
+                if (scanResultTitle) scanResultTitle.innerText = "STATUS DITUKAR: HADIR (HUTANG)";
+                if (scanResultAmount) {
+                    scanResultAmount.innerText = "HUTANG RM2";
+                    scanResultAmount.className = "px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 font-extrabold text-xs border border-rose-500/40 block mb-1";
+                }
+
+                details.innerText = `${pesilat.nama} (${pesilat.id}) - Ditukar kepada HADIR (HUTANG RM2.00)`;
+                timeSpan.innerText = new Date().toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+                banner.classList.remove('hidden');
+
+                showToast(`Imbasan Kedua: Status ${pesilat.nama} ditukar kepada HADIR (HUTANG RM 2.00).`, "warning");
+            }
+        }
+
+        function onScanFailure(error) {
+            // Quiet frame scan mode
+        }
+
+        function toggleDuitNowModal() {
+            document.getElementById('modalDuitNowQR').classList.toggle('hidden');
+        }
+
+        function handleRegistration(e) {
+            e.preventDefault();
+
+            const nama = document.getElementById('regNama').value.trim();
+            const noDokumen = document.getElementById('regDokumen').value.trim();
+            const tarikhLahir = document.getElementById('regTarikhLahir').value;
+            const jantina = document.getElementById('regJantina').value;
+            const phone = document.getElementById('regPhone').value.trim();
+            const warisPhone = document.getElementById('regWarisPhone').value.trim();
+            const alamat = document.getElementById('regAlamat').value.trim();
+
+            if (!warisPhone) {
+                showToast("Nombor telefon waris adalah wajib diisi!", "error");
+                return;
+            }
+
+            const newId = `PSL-${String(appState.pesilatList.length + 1).padStart(3, '0')}`;
+
+            const newPesilat = {
+                id: newId,
+                nama,
+                noDokumen,
+                tarikhLahir,
+                jantina,
+                phone,
+                warisPhone,
+                alamat
+            };
+
+            appState.pesilatList.push(newPesilat);
+
+            document.getElementById('formPendaftaran').reset();
+
+            renderAttendanceTable();
+            renderSenaraiPesilat();
+
+            showToast(`Pendaftaran Berjaya! ID Pesilat: ${newId}`, "success");
+
+            showQRModal(newPesilat.id);
+        }
+
+        function renderSenaraiPesilat(filterQuery = '') {
+            const grid = document.getElementById('pesilatCardsGrid');
+            let html = '';
+
+            const filteredList = appState.pesilatList.filter(p => 
+                p.nama.toLowerCase().includes(filterQuery.toLowerCase()) || 
+                p.noDokumen.includes(filterQuery) ||
+                p.id.toLowerCase().includes(filterQuery.toLowerCase())
+            );
+
+            if (filteredList.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400">Tiada pesilat dijumpai.</div>`;
+                return;
+            }
+
+            filteredList.forEach(pesilat => {
+                html += `
+                    <div class="glass-card p-5 rounded-2xl flex flex-col justify-between border border-slate-800 hover:border-amber-500/40 transition">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-[10px] font-mono px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold">${pesilat.id}</span>
+                                <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300">${pesilat.jantina}</span>
+                            </div>
+                            <h3 class="font-bold text-base text-white mb-1">${pesilat.nama}</h3>
+                            <p class="text-xs text-amber-300/80 font-mono mb-3"><i class="fa-solid fa-id-card mr-1"></i> ${pesilat.noDokumen}</p>
+                            
+                            <div class="space-y-1 text-xs text-slate-300 border-t border-slate-800/80 pt-3 mb-4">
+                                <p><strong class="text-slate-400">Telefon:</strong> ${pesilat.phone || '-'}</p>
+                                <p class="text-amber-400"><strong class="text-amber-300">Tel Waris (Kecemasan):</strong> ${pesilat.warisPhone}</p>
+                                <p class="line-clamp-2"><strong class="text-slate-400">Alamat:</strong> ${pesilat.alamat}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-2 border-t border-slate-800">
+                            <button onclick="showQRModal('${pesilat.id}')" class="w-full gold-button py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-qrcode"></i> Papar Pass Digital QR
+                            </button>
+                            ${appState.isAdminLoggedIn ? `
+                                <button onclick="deletePesilat('${pesilat.id}')" class="px-3 py-2 bg-rose-950 hover:bg-rose-900 border border-rose-500/40 text-rose-300 rounded-xl text-xs font-bold transition">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        function filterPesilatDirectory() {
+            const query = document.getElementById('searchPesilatInput').value;
+            renderSenaraiPesilat(query);
+        }
+
+        function deletePesilat(pesilatId) {
+            if (!appState.isAdminLoggedIn) {
+                showToast("Hanya Admin dibenarkan memadam pesilat.", "warning");
+                return;
+            }
+
+            const pesilat = appState.pesilatList.find(p => p.id === pesilatId);
+            if (!pesilat) return;
+
+            showConfirmModal(
+                "Padam Rekod Pesilat",
+                `Adakah anda pasti mahu memadam pesilat ${pesilat.nama} (${pesilat.id}) dari sistem?`,
+                () => {
+                    appState.pesilatList = appState.pesilatList.filter(p => p.id !== pesilatId);
+                    renderAttendanceTable();
+                    renderSenaraiPesilat();
+                    showToast(`Pesilat ${pesilat.nama} telah dipadam.`, "success");
+                }
+            );
+        }
+
+        function showQRModal(pesilatId) {
+            const pesilat = appState.pesilatList.find(p => p.id === pesilatId);
+            if (!pesilat) return;
+
+            currentQRModalPesilatId = pesilatId;
+
+            document.getElementById('qrModalNama').innerText = pesilat.nama;
+            document.getElementById('qrModalID').innerText = `ID: ${pesilat.id} | IC: ${pesilat.noDokumen}`;
+
+            const qrDisplay = document.getElementById('qrcodeDisplay');
+            qrDisplay.innerHTML = '';
+
+            new QRCode(qrDisplay, {
+                text: JSON.stringify({ id: pesilat.id, nama: pesilat.nama }),
+                width: 180,
+                height: 180,
+                colorDark: "#022c22",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            document.getElementById('modalQRPass').classList.remove('hidden');
+        }
+
+        function downloadQRPassImage() {
+            if (!currentQRModalPesilatId) return;
+
+            const pesilat = appState.pesilatList.find(p => p.id === currentQRModalPesilatId);
+            if (!pesilat) return;
+
+            const qrContainer = document.getElementById('qrcodeDisplay');
+            const qrImg = qrContainer.querySelector('img');
+            const qrCanvas = qrContainer.querySelector('canvas');
+
+            let qrSource = null;
+
+            if (qrImg && qrImg.src && qrImg.src.startsWith('data:image')) {
+                qrSource = qrImg;
+            } else if (qrCanvas) {
+                qrSource = qrCanvas;
+            }
+
+            if (!qrSource) {
+                showToast("Sila tunggu sebentar sehingga Kod QR selesai dijana.", "warning");
+                return;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+            canvas.height = 820;
+            const ctx = canvas.getContext('2d');
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 820);
+            gradient.addColorStop(0, '#022c22');
+            gradient.addColorStop(0.5, '#064e3b');
+            gradient.addColorStop(1, '#011711');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 600, 820);
+
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 8;
+            ctx.strokeRect(20, 20, 560, 780);
+
+            ctx.strokeStyle = '#d97706';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(28, 28, 544, 764);
+
+            ctx.fillStyle = '#fef08a';
+            ctx.font = 'bold 24px "Cinzel", Georgia, serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(appState.siteTitle, 300, 75);
+
+            ctx.fillStyle = '#f59e0b';
+            ctx.font = 'bold 14px sans-serif';
+            ctx.fillText('PASS DIGITAL KEHADIRAN PESILAT', 300, 105);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            if (ctx.roundRect) {
+                ctx.roundRect(140, 140, 320, 320, 20);
+            } else {
+                ctx.rect(140, 140, 320, 320);
+            }
+            ctx.fill();
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            ctx.drawImage(qrSource, 160, 160, 280, 280);
+
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+            ctx.beginPath();
+            if (ctx.roundRect) {
+                ctx.roundRect(50, 490, 500, 220, 16);
+            } else {
+                ctx.rect(50, 490, 500, 220);
+            }
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(245, 158, 11, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 22px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(pesilat.nama, 300, 535);
+
+            ctx.fillStyle = '#fef08a';
+            ctx.font = 'bold 18px monospace';
+            ctx.fillText(`ID PESILAT: ${pesilat.id}`, 300, 575);
+
+            ctx.fillStyle = '#cbd5e1';
+            ctx.font = '16px monospace';
+            ctx.fillText(`NO. MYKAD: ${pesilat.noDokumen}`, 300, 610);
+
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '14px sans-serif';
+            ctx.fillText(`Jantina: ${pesilat.jantina} | Tel Waris: ${pesilat.warisPhone}`, 300, 645);
+
+            ctx.fillStyle = '#f59e0b';
+            ctx.font = 'italic 13px sans-serif';
+            ctx.fillText('Tunjukkan Pass ini untuk imbasan kehadiran latihan.', 300, 750);
+
+            const imageUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `Pass_QR_${pesilat.id}_${pesilat.nama.replace(/\s+/g, '_')}.png`;
+            link.href = imageUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("Pass QR berjaya dimuat turun! Boleh disemak di Galeri telefon anda.", "success");
+        }
+
+        function closeQRModal() {
+            document.getElementById('modalQRPass').classList.add('hidden');
+        }
+
+        function handleAdminToggleClick() {
+            if (appState.isAdminLoggedIn) {
+                showConfirmModal(
+                    "Log Keluar Admin",
+                    "Adakah anda pasti mahu Log Keluar daripada Mod Admin?",
+                    () => {
+                        appState.isAdminLoggedIn = false;
+                        stopQRScanner();
+                        updateAdminUI();
+                        renderAttendanceTable();
+                        renderSenaraiPesilat();
+                        showToast("Log keluar Admin berjaya.", "info");
+                    }
+                );
+            } else {
+                toggleAdminModal();
+            }
+        }
+
+        function toggleAdminModal() {
+            document.getElementById('modalAdminLogin').classList.toggle('hidden');
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const inputPass = document.getElementById('adminPasswordInput').value.trim();
+
+            if (inputPass === appState.adminPassword) {
+                appState.isAdminLoggedIn = true;
+                document.getElementById('adminPasswordInput').value = '';
+                document.getElementById('modalAdminLogin').classList.add('hidden');
+                
+                updateAdminUI();
+                renderAttendanceTable();
+                renderSenaraiPesilat();
+                showToast("Log masuk Admin berjaya!", "success");
+            } else {
+                showToast("Kata laluan Admin salah!", "error");
+            }
+        }
+
+        function contactAdminWhatsApp() {
+            let phone = appState.adminPhone || "60123456789";
+            phone = phone.replace(/[^0-9]/g, '');
+            if (phone.startsWith('0')) {
+                phone = '60' + phone.substring(1);
+            }
+            const msg = encodeURIComponent(`Salam Admin, saya memerlukan bantuan bagi ${appState.siteTitle}.\n\nMaklumat Admin:\n- No. WhatsApp Admin: ${appState.adminPhone}\n- Kata Laluan Admin: ${appState.adminPassword}`);
+            window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+        }
+
+        function updateAdminUI() {
+            const badge = document.getElementById('adminBadge');
+            const statusText = document.getElementById('adminStatusText');
+            const btnText = document.getElementById('btnAdminText');
+            const btnAdminSettings = document.getElementById('btnAdminSettings');
+            const readOnlyNotice = document.getElementById('readOnlyNotice');
+            const adminNotice = document.getElementById('adminNotice');
+            const adminActionButtons = document.getElementById('adminActionButtons');
+            const thAdminAction = document.getElementById('thAdminAction');
+            const btnStartScanner = document.getElementById('btnStartScanner');
+            const btnEditTitle = document.getElementById('btnEditTitle');
+
+            if (appState.isAdminLoggedIn) {
+                statusText.innerText = "Mod Admin Aktif";
+                btnText.innerText = "Log Keluar Admin";
+                badge.className = "hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-semibold";
+                
+                if (btnAdminSettings) btnAdminSettings.classList.remove('hidden');
+                readOnlyNotice.classList.add('hidden');
+                adminNotice.classList.remove('hidden');
+                adminActionButtons.classList.remove('hidden');
+                if (thAdminAction) thAdminAction.classList.remove('hidden');
+                if (btnEditTitle) btnEditTitle.classList.remove('hidden');
+
+                if (btnStartScanner) {
+                    btnStartScanner.classList.remove('opacity-60');
+                    btnStartScanner.innerHTML = `<i class="fa-solid fa-camera"></i> Buka Kamera Belakang`;
+                }
+            } else {
+                statusText.innerText = "Pengunjung (Lihat Sahaja)";
+                btnText.innerText = "Log Masuk Admin";
+                badge.className = "hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold";
+
+                if (btnAdminSettings) btnAdminSettings.classList.add('hidden');
+                readOnlyNotice.classList.remove('hidden');
+                adminNotice.classList.add('hidden');
+                adminActionButtons.classList.add('hidden');
+                if (thAdminAction) thAdminAction.classList.add('hidden');
+                if (btnEditTitle) btnEditTitle.classList.add('hidden');
+
+                if (btnStartScanner) {
+                    btnStartScanner.classList.add('opacity-60');
+                    btnStartScanner.innerHTML = `<i class="fa-solid fa-lock text-amber-300"></i> Imbas QR (Khusus Admin)`;
+                }
+            }
+        }
+
+        function toggleChangePasswordModal() {
+            if (!appState.isAdminLoggedIn) {
+                showToast("Akses Terhad: Sila Log Masuk Admin terlebih dahulu.", "warning");
+                return;
+            }
+            const modal = document.getElementById('modalChangePassword');
+            const phoneInput = document.getElementById('adminPhoneInput');
+            if (phoneInput) {
+                phoneInput.value = appState.adminPhone || "60123456789";
+            }
+            modal.classList.toggle('hidden');
+        }
+
+        function handleChangePassword(e) {
+            e.preventDefault();
+            const curr = document.getElementById('currentPassInput').value.trim();
+            const newP = document.getElementById('newPassInput').value.trim();
+            const newPhone = document.getElementById('adminPhoneInput').value.trim();
+
+            if (curr !== appState.adminPassword) {
+                showToast("Kata laluan semasa tidak tepat!", "error");
+                return;
+            }
+
+            if (newPhone) {
+                appState.adminPhone = newPhone;
+            }
+
+            appState.adminPassword = newP;
+            document.getElementById('currentPassInput').value = '';
+            document.getElementById('newPassInput').value = '';
+            toggleChangePasswordModal();
+            showToast("Tetapan Admin & No. WhatsApp berjaya dikemaskini!", "success");
+        }
+
+        function downloadDailyAttendanceReport() {
+            const dateVal = appState.selectedDate;
+            const records = appState.attendanceRecords[dateVal] || {};
+
+            let totalHadirLunas = 0;
+            let totalHadirHutang = 0;
+            let totalTidakHadir = 0;
+            let totalKutipan = 0;
+
+            let rows = [];
+
+            appState.pesilatList.forEach((pesilat, idx) => {
+                const rec = records[pesilat.id] || { status: 'tidak_hadir', paymentStatus: 'belum_bayar', paid: false, isHutang: false, amount: 0 };
+                let pStatus = rec.paymentStatus;
+                if (!pStatus) {
+                    if (rec.paid) pStatus = 'lunas';
+                    else if (rec.isHutang) pStatus = 'hutang';
+                    else pStatus = 'belum_bayar';
+                }
+
+                let statusText = "TIDAK HADIR";
+                let yuranText = "RM 0.00 (Belum Bayar)";
+
+                if (rec.status === 'hadir') {
+                    if (pStatus === 'lunas') {
+                        totalHadirLunas++;
+                        totalKutipan += (rec.amount || 2.00);
+                        statusText = "HADIR";
+                        yuranText = "RM 2.00 (LUNAS)";
+                    } else {
+                        totalHadirHutang++;
+                        statusText = "HADIR";
+                        yuranText = "RM 0.00 (HUTANG RM2)";
+                    }
+                } else {
+                    totalTidakHadir++;
+                }
+
+                rows.push(`${idx + 1}. [${pesilat.id}] ${pesilat.nama} | MyKad: ${pesilat.noDokumen} | Status: ${statusText} | Yuran: ${yuranText}`);
+            });
+
+            const content = `===========================================================
+LAPORAN KEHADIRAN HARIAN PESILAT
+===========================================================
+TAJUK PERSATUAN : ${appState.siteTitle}
+TARIKH SESI     : ${dateVal}
+DIJANA PADA     : ${new Date().toLocaleString('ms-MY')}
+-----------------------------------------------------------
+RINGKASAN KEHADIRAN:
+- Jumlah Pesilat Berdaftar : ${appState.pesilatList.length} orang
+- Jumlah Hadir (Lunas)    : ${totalHadirLunas} orang
+- Jumlah Hadir (Hutang)   : ${totalHadirHutang} orang
+- Jumlah Tidak Hadir      : ${totalTidakHadir} orang
+- Total Kutipan Yuran     : RM ${totalKutipan.toFixed(2)}
+-----------------------------------------------------------
+SENARAI KEHADIRAN PESILAT:
+-----------------------------------------------------------
+${rows.length > 0 ? rows.join('\n') : 'Tiada rekod pesilat.'}
+
+===========================================================
+Dokumen ini dijana secara automatik oleh ${appState.siteTitle}.
+===========================================================`;
+
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Salinan_Kehadiran_${dateVal}_${appState.siteTitle.replace(/\s+/g, '_')}.txt`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+
+            showToast("Salinan laporan kehadiran harian berjaya dimuat turun!", "success");
+        }
+
+        function showToast(message, type = "info") {
+            const toast = document.createElement('div');
+            let bgClass = "bg-slate-900 border-amber-500/50 text-amber-200";
+            let icon = "fa-info-circle";
+
+            if (type === "success") {
+                bgClass = "bg-emerald-950 border-emerald-500 text-emerald-200";
+                icon = "fa-circle-check";
+            } else if (type === "error") {
+                bgClass = "bg-rose-950 border-rose-500 text-rose-200";
+                icon = "fa-triangle-exclamation";
+            } else if (type === "warning") {
+                bgClass = "bg-amber-950 border-amber-500 text-amber-200";
+                icon = "fa-lock";
+            }
+
+            toast.className = `fixed bottom-5 right-5 z-50 p-4 rounded-xl border shadow-2xl flex items-center gap-3 font-semibold text-xs transition-all duration-300 transform translate-y-2 opacity-0 ${bgClass}`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-lg"></i> <span>${message}</span>`;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+    </script>
+</body>
+</html>tu 
